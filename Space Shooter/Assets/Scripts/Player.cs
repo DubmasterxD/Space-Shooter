@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     [Header("Player")]
     [SerializeField] float moveSpeed = 10f;
     [SerializeField] float padding = 0.5f;
-    [SerializeField] int health = 500;
+    [SerializeField] int maxHealth = 500;
+    [SerializeField] Image healthBar = null;
     [Header("Projectiles")]
     [SerializeField] GameObject laserPrefab = null;
     [SerializeField] float laserSpeed = 5f;
@@ -15,6 +17,7 @@ public class Player : MonoBehaviour
     [Header("Death")]
     [SerializeField] AudioClip deathSFX = null;
     AudioSource audioSource = null;
+    int health;
     bool isFiring = false;
     float xMin;
     float xMax;
@@ -22,6 +25,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        health = maxHealth;
         audioSource = GetComponent<AudioSource>();
         SetupMoveBoundaries();
     }
@@ -42,6 +46,7 @@ public class Player : MonoBehaviour
     private void ProcessHit(DamageDealer damageDealer)
     {
         health -= damageDealer.Damage;
+        healthBar.fillAmount = Mathf.Clamp((float)health / maxHealth, 0, maxHealth);
         if (health <= 0)
         {
             Die();

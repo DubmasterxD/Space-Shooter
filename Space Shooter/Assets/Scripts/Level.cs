@@ -6,6 +6,11 @@ using UnityEngine.SceneManagement;
 public class Level : MonoBehaviour
 {
 
+    private void Awake()
+    {
+        Screen.SetResolution(540, 960, false);
+    }
+
     [SerializeField] float delayInSeconds = 2f;
 
     public void LoadStartMenu()
@@ -15,6 +20,7 @@ public class Level : MonoBehaviour
 
     public void LoadGame()
     {
+        FindObjectOfType<GameController>().ResetGame();
         SceneManager.LoadScene("Game");
     }
 
