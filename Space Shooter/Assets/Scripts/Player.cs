@@ -1,17 +1,20 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-
+    [Header("Player")]
     [SerializeField] float moveSpeed = 10f;
     [SerializeField] float padding = 0.5f;
     [SerializeField] int health = 500;
+    [Header("Projectiles")]
     [SerializeField] GameObject laserPrefab = null;
     [SerializeField] float laserSpeed = 5f;
     [SerializeField] float projectileFiringPeriod = 0.2f;
+    [Header("Death")]
+    [SerializeField] AudioClip deathSFX = null;
+    AudioSource audioSource = null;
     bool isFiring = false;
     float xMin;
     float xMax;
@@ -19,6 +22,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         SetupMoveBoundaries();
     }
 
@@ -40,9 +44,16 @@ public class Player : MonoBehaviour
         health -= damageDealer.Damage;
         if (health <= 0)
         {
-            Destroy(gameObject);
+            Die();
         }
         Destroy(damageDealer.gameObject);
+    }
+
+    private void Die()
+    {
+        FindObjectOfType<Level>().LoadGameOver();
+        Destroy(gameObject);
+        AudioSource.PlayClipAtPoint(deathSFX, Camera.main.transform.position);
     }
 
     private void Fire()
@@ -60,6 +71,7 @@ public class Player : MonoBehaviour
         {
             GameObject laser = Instantiate(laserPrefab, transform.position, Quaternion.identity);
             laser.GetComponent<Rigidbody2D>().velocity = new Vector2(0, laserSpeed);
+            audioSource.PlayOneShot(audioSource.clip);
             yield return new WaitForSeconds(projectileFiringPeriod);
         }
         isFiring = false;
